@@ -64,15 +64,4 @@ func (h *DefaultHandler) CompleteText(task *schema.Task, text string) {
 	h.DefaultOperations.srv.tasks.put(task)
 }
 
-// Helper: StreamDemo streams a basic running→artifact→completed sequence.
-func (h *DefaultHandler) StreamDemo(task *schema.Task) {
-	task.Touch(schema.TaskRunning)
-	_ = h.DefaultOperations.sendStatus(context.Background(), task, false)
-	art := schema.Artifact{ID: "a-" + task.ID, CreatedAt: time.Now().UTC(), Parts: []schema.Part{schema.TextPart{Type: "text", Text: "processing..."}}}
-	art.PartsRaw, _ = schema.MarshalParts(art.Parts)
-	_ = h.DefaultOperations.sendArtifact(context.Background(), task, art, true, false)
-	task.Touch(schema.TaskCompleted)
-	task.Artifacts = append(task.Artifacts, art)
-	h.DefaultOperations.srv.tasks.put(task)
-	_ = h.DefaultOperations.sendStatus(context.Background(), task, true)
-}
+// Note: demo streaming helpers are intentionally not exported to avoid public API bloat.
